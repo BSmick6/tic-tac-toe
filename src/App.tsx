@@ -94,13 +94,23 @@ function Board() {
     setXIsNext(!xIsNext)
   }
 
+  function restart() {
+    setSquares(Array(9).fill(null))
+    setXIsNext(true)
+  }
+
   return (
-    <div className="board">
-      {squares.map((value, i) => (
-        <Square key={i} value={value} onClick={() => handleClick(i)} />
-      ))}
-      {result && <StrikeLine line={result.line} />}
-    </div>
+    <>
+      <div className="board">
+        {squares.map((value, i) => (
+          <Square key={i} value={value} onClick={() => handleClick(i)} />
+        ))}
+        {result && <StrikeLine line={result.line} />}
+      </div>
+      <button className="restart" onClick={restart}>
+        Restart
+      </button>
+    </>
   )
 }
 

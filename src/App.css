@@ -48,3 +48,19 @@
     outline-offset: -2px;
   }
 }
+
+.restart {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 24px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-bg);
+  }
+}

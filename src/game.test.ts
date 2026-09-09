@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { WINNING_LINES, calculateWinner, createEmptyBoard, makeMove } from './game'
+import {
+  WINNING_LINES,
+  calculateWinner,
+  createEmptyBoard,
+  isBoardFull,
+  makeMove,
+  randomBotMove,
+  type Squares,
+} from './game'
 
 describe('createEmptyBoard', () => {
   it('returns nine empty squares', () => {
@@ -64,5 +72,47 @@ describe('makeMove', () => {
     expect(next).not.toBe(squares)
     expect(squares[0]).toBeNull()
     expect(next).toEqual(['X', ...Array(8).fill(null)])
+  })
+})
+
+describe('isBoardFull', () => {
+  it('returns false for an empty board', () => {
+    expect(isBoardFull(createEmptyBoard())).toBe(false)
+  })
+
+  it('returns false while squares remain free', () => {
+    const squares = createEmptyBoard()
+    squares[0] = 'X'
+    squares[1] = 'O'
+    expect(isBoardFull(squares)).toBe(false)
+  })
+
+  it('returns true when every square is filled', () => {
+    const squares: Squares = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'O']
+    expect(isBoardFull(squares)).toBe(true)
+  })
+})
+
+describe('randomBotMove', () => {
+  it('returns null when the board is full', () => {
+    const squares: Squares = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'O']
+    expect(randomBotMove(squares)).toBeNull()
+  })
+
+  it('returns the only free square', () => {
+    const squares: Squares = ['X', 'O', 'X', 'O', 'X', 'O', null, 'X', 'O']
+    expect(randomBotMove(squares)).toBe(6)
+  })
+
+  it('returns a free square on a partially filled board', () => {
+    const squares = createEmptyBoard()
+    squares[0] = 'X'
+    squares[4] = 'O'
+    const free = [1, 2, 3, 5, 6, 7, 8]
+    const move = randomBotMove(squares)
+    expect(move).not.toBeNull()
+    if (move === null) return // narrows the type; the assertion above already failed
+    expect(free).toContain(move)
+    expect(squares[move]).toBeNull()
   })
 })

@@ -49,6 +49,21 @@
   }
 }
 
+.bot-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--text);
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+  }
+}
+
 .restart {
   font-size: 18px;
   font-weight: 600;

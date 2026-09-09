@@ -33,3 +33,16 @@ export function makeMove(squares: Squares, index: number, player: Player): Squar
   next[index] = player
   return next
 }
+
+export function isBoardFull(squares: Squares): boolean {
+  return squares.every((square) => square !== null)
+}
+
+export function randomBotMove(squares: Squares): number | null {
+  const free: number[] = []
+  squares.forEach((square, i) => {
+    if (square === null) free.push(i)
+  })
+  if (free.length === 0) return null
+  return free[Math.floor(Math.random() * free.length)]
+}

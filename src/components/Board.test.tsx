@@ -12,12 +12,15 @@ function squareButtons() {
 }
 
 describe('Board', () => {
-  it('renders an empty board and a restart button', () => {
+  it('renders an empty board, a bot toggle, and a restart button', () => {
     render(<Board />)
     expect(squareButtons()).toHaveLength(SQUARE_COUNT)
     squareButtons().forEach((square) => {
       expect(square).toBeEmptyDOMElement()
     })
+    expect(
+      screen.getByRole('checkbox', { name: 'Play vs bot' }),
+    ).not.toBeChecked()
     expect(
       screen.getByRole('button', { name: 'Restart' }),
     ).toBeInTheDocument()
@@ -83,5 +86,45 @@ describe('Board', () => {
 
     await user.click(squares[4])
     expect(squares[4]).toHaveTextContent('X')
+  })
+
+  it('lets the bot reply with O when playing against a bot', async () => {
+    const user = userEvent.setup()
+    render(<Board />)
+    await user.click(screen.getByRole('checkbox', { name: 'Play vs bot' }))
+
+    await user.click(squareButtons()[0]) // human X
+
+    const squares = squareButtons()
+    const filled = squares.filter((square) => square.textContent !== '')
+    const marks = filled.map((square) => square.textContent)
+
+    expect(filled).toHaveLength(2)
+    expect(squares[0]).toHaveTextContent('X')
+    expect(marks).toContain('O')
+  })
+
+  it('has the bot take over O when toggled mid-game', async () => {
+    const user = userEvent.setup()
+    render(<Board />)
+    const squares = squareButtons()
+
+    await user.click(squares[0]) // X
+    await user.click(squares[1]) // O, still 2-player
+
+    await user.click(screen.getByRole('checkbox', { name: 'Play vs bot' }))
+
+    await user.click(squares[2]) // human X, bot should answer
+
+    const filled = squareButtons()
+      .filter((square) => square.textContent !== '')
+      .map((square) => square.textContent)
+      .join('')
+
+    expect(filled).toHaveLength(4)
+    expect(squares[0]).toHaveTextContent('X')
+    expect(squares[1]).toHaveTextContent('O')
+    expect(squares[2]).toHaveTextContent('X')
+    expect(filled).toContain('O')
   })
 })

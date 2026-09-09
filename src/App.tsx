@@ -14,13 +14,56 @@ const WINNING_LINES = [
   [2, 4, 6],
 ]
 
-function calculateWinner(squares: (Player | null)[]): Player | null {
-  for (const [a, b, c] of WINNING_LINES) {
+const CELL = 100
+const GAP = 4
+const BOARD_SIZE = CELL * 3 + GAP * 2
+
+function calculateWinner(
+  squares: (Player | null)[],
+): { winner: Player; line: number[] } | null {
+  for (const line of WINNING_LINES) {
+    const [a, b, c] = line
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a]
+      return { winner: squares[a], line }
     }
   }
   return null
+}
+
+function cellCenter(i: number): { x: number; y: number } {
+  const row = Math.floor(i / 3)
+  const col = i % 3
+  return {
+    x: col * (CELL + GAP) + CELL / 2,
+    y: row * (CELL + GAP) + CELL / 2,
+  }
+}
+
+function StrikeLine({ line }: { line: number[] }) {
+  const [a, , c] = line
+  const start = cellCenter(a)
+  const end = cellCenter(c)
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const len = Math.hypot(dx, dy)
+  const extension = 50
+  const ux = (dx / len) * extension
+  const uy = (dy / len) * extension
+
+  return (
+    <svg
+      className="win-line"
+      viewBox={`0 0 ${BOARD_SIZE} ${BOARD_SIZE}`}
+      aria-hidden="true"
+    >
+      <line
+        x1={start.x - ux}
+        y1={start.y - uy}
+        x2={end.x + ux}
+        y2={end.y + uy}
+      />
+    </svg>
+  )
 }
 
 function Square({
@@ -41,10 +84,10 @@ function Board() {
   const [squares, setSquares] = useState<(Player | null)[]>(Array(9).fill(null))
   const [xIsNext, setXIsNext] = useState(true)
 
-  const winner = calculateWinner(squares)
+  const result = calculateWinner(squares)
 
   function handleClick(i: number) {
-    if (squares[i] || winner) return
+    if (squares[i] || result) return
     const nextSquares = squares.slice()
     nextSquares[i] = xIsNext ? 'X' : 'O'
     setSquares(nextSquares)
@@ -56,6 +99,7 @@ function Board() {
       {squares.map((value, i) => (
         <Square key={i} value={value} onClick={() => handleClick(i)} />
       ))}
+      {result && <StrikeLine line={result.line} />}
     </div>
   )
 }

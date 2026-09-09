@@ -1,14 +1,38 @@
+import { useState } from 'react'
 import './App.css'
 
-function Square() {
-  return <button className="square"></button>
+type Player = 'X' | 'O'
+
+function Square({
+  value,
+  onClick,
+}: {
+  value: Player | null
+  onClick: () => void
+}) {
+  return (
+    <button className="square" onClick={onClick}>
+      {value}
+    </button>
+  )
 }
 
 function Board() {
+  const [squares, setSquares] = useState<(Player | null)[]>(Array(9).fill(null))
+  const [xIsNext, setXIsNext] = useState(true)
+
+  function handleClick(i: number) {
+    if (squares[i]) return
+    const nextSquares = squares.slice()
+    nextSquares[i] = xIsNext ? 'X' : 'O'
+    setSquares(nextSquares)
+    setXIsNext(!xIsNext)
+  }
+
   return (
     <div className="board">
-      {Array.from({ length: 9 }, (_, i) => (
-        <Square key={i} />
+      {squares.map((value, i) => (
+        <Square key={i} value={value} onClick={() => handleClick(i)} />
       ))}
     </div>
   )
